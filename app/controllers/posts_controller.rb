@@ -8,6 +8,13 @@ class PostsController < ApplicationController
         post = Post.find_by(params[:id])
         render json: post,  except: [:updated_at]
     end
+
+    def destroy
+        post = Post.find_by(params[:id])
+        post.destroy
+    end
+
+    
 end
 # sighting.to_json(:include => {
 #     :bird => {:only => [:name, :species]},

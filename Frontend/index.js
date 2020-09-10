@@ -1,6 +1,6 @@
 //Goals
-// When the html page is loaded, we want a login screen/div to appear 
-//User is shown their specific posts once logged in
+// When the html page is loaded, we want a login screen/div to appear -done
+//User is shown their specific posts once logged in -done 
 //User can create posts
 //User can edit posts
 //User can delete posts
@@ -73,13 +73,30 @@ function verifyUser(e) {
                             "Accept": "application/json"
                         },
                         body: JSON.stringify({
-                            login: true,
+                            login: 1
                         })
                     });
-                    //console.log(user)
-                    showPostDiv();
-                    fetchPosts();
-                }
+                    console.log(user)
+                  }  //showPosts();
+                // }else{
+                //     user.login = false;
+                //     userId = user.id
+                //     // console.log(typeof `${user.id}`)    Fredric Glover  nelly_schaefer@ledner-tremblay.name
+                //     // fetch(`${userUrl}/${userId}`)
+                //     // .then(r => r.json())
+                //     // .then(console.log)
+                //     fetch(`http://localhost:3000/users/${userId}`, {
+                //         method: "PATCH",
+                //         mode: "cors",
+                //         headers: {
+                //             "Content-Type": "application/json",
+                //             "Accept": "application/json"
+                //         },
+                //         body: JSON.stringify({
+                //             login: 0
+                //         })
+                //     });
+                // }
             }
         });
 }
@@ -93,67 +110,88 @@ function verifyUser(e) {
 //==============================================================================
 //Render Specific User Posts
 
-function showApp() {
+function showPosts() {
     body.innerHTML = ''
-    const postsDiv = createElement('div')
+    //========postsDiv creation
+    const postsDiv = document.createElement('div')
     postsDiv.setAttribute('id', 'posts')
+    //========logoutBtn creation
+    const logoutBtn = document.createElement('button')
+    logoutBtn.innerHTML = 'Logout'
+    logoutBtn.setAttribute('id', 'logout')
+    logoutBtn.setAttribute('class', 'button')
+    //======= appending body to child
+    body.append(logoutBtn)
     body.append(postsDiv)
 
+    fetchPosts();
+}
 
 
-    //must fetch all posts related to user 
-
-
-
-    function fetchPosts() {
-        currentUserId();
-        //console.log(currentUserId())
-        fetch(postUrl)
-            .then(resp => resp.json())
-            .then(renderPosts)
-    }
-
-    function renderPosts(posts) {
-        for (const post of posts) {
-            if (post.user_id === currentUserId()) {
-                //===============Grab postsDiv
-                const postsDiv = document.querySelector('#posts')
-                //===========Delete button creation
-                const deleteBtn = document.createElement("button")
-                deleteBtn.innerText = "Delete"
-                deleteBtn.setAttribute('data-id', post.id)
-                deleteBtn.addEventListener('click', deletePost)
-                //==============Favorite Button creation
-                const favBtn = document.createElement("button")
-                const postDiv = createElement('div')
-                postsDiv.innerHTML = `<h3>${post.title}</h3>
-                                  <p>${post.description}</p>`
-                postDiv.append(deleteBtn)
-                postDiv.append(favBtn)
-                postsDiv.append(postDiv)
-
-            }
-        }
-    }
+//must fetch all posts related to user 
 
 
 
+function fetchPosts() {
+  
+    fetch(postUrl)
+        .then(resp => resp.json())
+        .then((posts) => {
 
-    function currentUserId() {
-        fetch(userUrl)
-            .then(resp => resp.json())
-            .then((users) => {
-                for (const user of users) {
-                    if (user.login === true) {
-                        return user.id
-                        //console.log(user)
+         
+            fetch(userUrl)
+                .then(resp => resp.json())
+                .then((users) => {
+                    for (const user of users) {
+                        if (user.login === true) {
+
+                            for (const post of posts) {
+                                if (post.user_id === user.id) {
+                                    //===============Grab postsDiv
+                                    const postsDiv = document.querySelector('#posts')
+                                    //===============Edit button creation
+                                    const editBtn = document.createElement("button")
+                                    editBtn.innerText = "Edit"
+                                    editBtn.setAttribute('data-id', post.id)
+                                    editBtn.setAttribute('class', 'button')
+                                    //editBtn.addEventListener('click', editPost)
+                                    //===========Delete button creation
+                                    const deleteBtn = document.createElement("button")
+                                    deleteBtn.innerText = "Delete"
+                                    deleteBtn.setAttribute('data-id', post.id)
+                                    deleteBtn.setAttribute('class', 'button')
+                                    //deleteBtn.addEventListener('click', deletePost)
+                                    //==============Favorite Button creation
+                                    const favBtn = document.createElement("button")
+                                    favBtn.innerText = "Favorite"
+                                    favBtn.setAttribute('data-id', post.id)
+                                    favBtn.setAttribute('class', 'button')
+                                    //favBtn.addEventListener('click', favoritePost)
+                                    //=============Post div creation
+                                    const postDiv = document.createElement('div')
+                                    postsDiv.innerHTML = `<h3>${post.title}</h3>
+                                      <p>${post.description}</p>
+                                      <p>${post.created_at}<p>`
+
+                                    //=============Appending children 
+                                    postDiv.append(editBtn)
+                                    postDiv.append(deleteBtn)
+                                    postDiv.append(favBtn)
+                                    postsDiv.append(postDiv)
+
+                                }
+                            }
+                            
+                        }
                     }
-                }
-            });
-    }
+                });
 
-//     postsDiv = document.createElement('div')
+        });
+}
 
 
-//     console.log('this is where the app pops up')
-// }
+
+
+
+
+//alejandro_prohaska@bogan-fritsch.org   Sidney Denesik CPA
