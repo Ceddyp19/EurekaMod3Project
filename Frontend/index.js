@@ -15,16 +15,16 @@ const signInButton = document.querySelector('#sign-up').addEventListener('click'
 
 //=========================================================================
 //Login Functions
-function showLoginScreen(){
-   let loginDiv = document.createElement('div')
-   loginDiv.setAttribute('id', 'loginScreen')
-   loginDiv.innerHTML = ` <h2>Hello, Login or Sign-up </h2>
+function showLoginScreen() {
+    let loginDiv = document.createElement('div')
+    loginDiv.setAttribute('id', 'loginScreen')
+    loginDiv.innerHTML = ` <h2>Hello, Login or Sign-up </h2>
                           <button id='login'>Login</button>
                           <button id='sign-up'>Signup</button>`
-  body.append(loginDiv)
+    body.append(loginDiv)
 }
 
-function userLogin(){
+function userLogin() {
     // let loginDiv = document.querySelector('div')
     // loginDiv.style.visibility = "hidden";
     body.innerHTML = ''
@@ -32,8 +32,8 @@ function userLogin(){
     // .then(resp => resp.json())
     // .then(console.log)
     let loginForm = document.createElement('form')
-    loginForm.setAttribute('id','login-form')
-    
+    loginForm.setAttribute('id', 'login-form')
+
     loginForm.innerHTML = `<label for="name">Name:</label>
                            <input type="text" id="name" name="fname"><br>
                            <label for="email">Email:</label>
@@ -44,25 +44,44 @@ function userLogin(){
 }
 
 
-function userSignUp(){
+function userSignUp() {
     body.append(loginForm)
-  console.log('hi')
+    console.log('hi')
 }
 
 
-function verifyUser(e){
+function verifyUser(e) {
     e.preventDefault();
     //console.log(e.target.email.value)
     fetch(userUrl)
-    .then(resp => resp.json())
-    .then((users) => {
-        for( user of users){
-            //console.log(user.email)
-            if(e.target.name.value === user.name & e.target.email.value === user.email){
-                showApp();
+        .then(resp => resp.json())
+        .then((users) => {
+            for (const user of users) {
+                //console.log(user)
+                if (e.target.name.value === user.name & e.target.email.value === user.email) {
+                    user.login = true;
+                    userId = user.id
+                    // console.log(typeof `${user.id}`)    Fredric Glover  nelly_schaefer@ledner-tremblay.name
+                    // fetch(`${userUrl}/${userId}`)
+                    // .then(r => r.json())
+                    // .then(console.log)
+                    fetch(`http://localhost:3000/users/${userId}`, {
+                        method: "PATCH",
+                        mode: "cors",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Accept": "application/json"
+                        },
+                        body: JSON.stringify({
+                            login: true,
+                        })
+                    });
+                    //console.log(user)
+                    showPostDiv();
+                    fetchPosts();
+                }
             }
-        }
-    });
+        });
 }
 //=============================================================================
 //Sign-up Functions
@@ -74,12 +93,67 @@ function verifyUser(e){
 //==============================================================================
 //Render Specific User Posts
 
-function showApp(){
+function showApp() {
     body.innerHTML = ''
-//must fetch all posts related to user 
+    const postsDiv = createElement('div')
+    postsDiv.setAttribute('id', 'posts')
+    body.append(postsDiv)
 
 
-    postsDiv = document.createElement('div')
-    
-    console.log('this is where the app pops up')
-}
+
+    //must fetch all posts related to user 
+
+
+
+    function fetchPosts() {
+        currentUserId();
+        //console.log(currentUserId())
+        fetch(postUrl)
+            .then(resp => resp.json())
+            .then(renderPosts)
+    }
+
+    function renderPosts(posts) {
+        for (const post of posts) {
+            if (post.user_id === currentUserId()) {
+                //===============Grab postsDiv
+                const postsDiv = document.querySelector('#posts')
+                //===========Delete button creation
+                const deleteBtn = document.createElement("button")
+                deleteBtn.innerText = "Delete"
+                deleteBtn.setAttribute('data-id', post.id)
+                deleteBtn.addEventListener('click', deletePost)
+                //==============Favorite Button creation
+                const favBtn = document.createElement("button")
+                const postDiv = createElement('div')
+                postsDiv.innerHTML = `<h3>${post.title}</h3>
+                                  <p>${post.description}</p>`
+                postDiv.append(deleteBtn)
+                postDiv.append(favBtn)
+                postsDiv.append(postDiv)
+
+            }
+        }
+    }
+
+
+
+
+    function currentUserId() {
+        fetch(userUrl)
+            .then(resp => resp.json())
+            .then((users) => {
+                for (const user of users) {
+                    if (user.login === true) {
+                        return user.id
+                        //console.log(user)
+                    }
+                }
+            });
+    }
+
+//     postsDiv = document.createElement('div')
+
+
+//     console.log('this is where the app pops up')
+// }

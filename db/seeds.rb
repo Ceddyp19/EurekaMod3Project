@@ -7,7 +7,7 @@
 #   Character.create(name: 'Luke', movie: movies.first)
 require 'faker'
 5.times do 
-    User.create(name: Faker::Name.unique.name, email: Faker::Internet.unique.email, login?: false)
+    User.create(name: Faker::Name.unique.name, email: Faker::Internet.unique.email, login: false)
 end
 
 post1 = Post.create(title: Faker::Quote.singular_siegler, description: Faker::Quote.most_interesting_man_in_the_world, user_id: 1, isFavorite: true)
